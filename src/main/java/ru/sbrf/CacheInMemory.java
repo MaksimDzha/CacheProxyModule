@@ -1,4 +1,4 @@
-package ru.sbrf.javaschool;
+package ru.sbrf;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;

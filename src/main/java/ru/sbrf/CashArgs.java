@@ -1,4 +1,4 @@
-package ru.sbrf.javaschool;
+package ru.sbrf;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -16,7 +16,7 @@ class CashArgs {
         if (args != null)
             if (!argsToCache.isEmpty())
                 for (Integer i : argsToCache)
-                    cacheArgs += args[i-1].toString() + " ";
+                    cacheArgs += args[i-1].toString() + ", ";
             else
                 for (Object arg : args)
                     cacheArgs += arg.toString() + " ";

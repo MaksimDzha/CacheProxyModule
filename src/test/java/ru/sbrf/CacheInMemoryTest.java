@@ -1,4 +1,4 @@
-package ru.sbrf.javaschool;
+package ru.sbrf;
 
 import org.junit.Test;
 

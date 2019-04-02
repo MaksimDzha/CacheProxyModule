@@ -1,4 +1,4 @@
-package ru.sbrf.javaschool;
+package ru.sbrf;
 
 import java.io.Serializable;
 import java.util.*;

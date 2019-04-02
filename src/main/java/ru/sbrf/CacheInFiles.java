@@ -1,4 +1,4 @@
-package ru.sbrf.javaschool;
+package ru.sbrf;
 
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
@@ -16,10 +16,10 @@ class CacheInFiles {
     /**
      * Поиск результата в кэшированных файлах
      *
-     * @param method Метод, результат работы которого необходимо найти или кэшировать
-     * @param args Аргументы, переданные в method
+     * @param method      Метод, результат работы которого необходимо найти или кэшировать
+     * @param args        Аргументы, переданные в method
      * @param cacheObject Объект, в котором реализован method
-     * @param cacheAnn Аннотация с настройками вариантов кэширования (см. Cache.class)
+     * @param cacheAnn    Аннотация с настройками вариантов кэширования (см. Cache.class)
      */
     static Object findInFiles(Method method, Object[] args, Object cacheObject, Cache cacheAnn) {
         String cacheArgs = CashArgs.get(args, cacheAnn); //Индекс для поиска или записи результата
@@ -51,14 +51,14 @@ class CacheInFiles {
         }
         cacheMethods.put(cacheArgs, Trim.trim(method, result, cacheAnn.countElement()));
         try {
+            CacheDir.create();
             FileOutputStream fos = new FileOutputStream(fileName(cacheObject, method, cacheAnn));
             ObjectOutputStream oos = new ObjectOutputStream(fos);
             oos.writeObject(cacheMethods);
             oos.flush();
             oos.close();
         } catch (Exception e) {
-            System.out.println("Попытка кэширования не сериализуемого результата. " +
-                    "Используйте для результата сериализуемый класс.");
+            System.out.println("Ошибка записи");
 //            e.printStackTrace();
         }
         return result;
@@ -67,8 +67,8 @@ class CacheInFiles {
     //Получение имени файла, в котором должны содержаться кэшированные данные
     private static String fileName(Object cacheObject, Method method, Cache cacheAnn) {
         if (cacheAnn.fileName().isEmpty())
-            return ("C:\\Users\\User\\IdeaProjects\\CacheProxyModule\\src\\cache\\" + cacheObject.hashCode() + "." + cacheObject.getClass().getName() + "." + method.getName() + ".cache");
-        else return ("C:\\Users\\User\\IdeaProjects\\CacheProxyModule\\src\\cache\\" + cacheAnn.fileName() + ".cache");
+            return (CacheDir.getCachePath() + cacheObject.hashCode() + "." + cacheObject.getClass().getName() + "." + method.getName() + ".cache");
+        else return (CacheDir.getCachePath() + cacheAnn.fileName() + ".cache");
     }
 
 

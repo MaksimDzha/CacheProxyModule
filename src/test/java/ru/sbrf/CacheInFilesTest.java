@@ -1,4 +1,4 @@
-package ru.sbrf.javaschool;
+package ru.sbrf;
 
 import org.junit.Test;
 
@@ -9,11 +9,12 @@ import java.util.List;
 import static org.junit.Assert.*;
 
 public class CacheInFilesTest {
-//Требуется очистка папки cache перед выполнением теста
+
     @Test
     @Cache(countElement = 7)
     public void findInFiles() throws NoSuchMethodException {
-
+        //Требуется очистка папки cache перед выполнением теста
+        CacheDir.delete();
         for (int j = 0; j < 3; j++) {
 
             List<Integer> testObject1 = new LinkedList<>();
