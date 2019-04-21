@@ -15,7 +15,13 @@ class CacheInMemory {
     private static Map<String, Object> cacheMethods = new HashMap<>();
 
     //Ключ для хранения результата
-    private static String key;
+    private String key;
+
+    //Класс для создания одной из частей "ключа" из массива аргументов
+    private CacheArgs cArgs = new CacheArgs();
+
+    //Класс для "обрезания" слишком больших контейнеров и массивов
+    private  Trim trim = new Trim();
 
     /**
      * Поиск результата в памяти
@@ -25,8 +31,8 @@ class CacheInMemory {
      * @param cacheObject Объект, в котором реализован method
      * @param cacheAnn Аннотация с настройками вариантов кэширования (см. Cache.class)
      */
-    static Object findInMemory(Method method, Object[] args, Object cacheObject, Cache cacheAnn) {
-        String cacheArgs = CashArgs.get(args, cacheAnn);
+    Object findInMemory(Method method, Object[] args, Object cacheObject, Cache cacheAnn) {
+        String cacheArgs = cArgs.get(args, cacheAnn);
         key = cacheObject.hashCode() + ", " + cacheObject.getClass().getName() + ", " + method.toString();
         if (cacheMemori.containsKey(key))
             if (cacheMethods.containsKey(cacheArgs)) {
@@ -38,14 +44,14 @@ class CacheInMemory {
     }
 
     //Запись результата в память
-    private static Object cacheInMemori(Method method, Object[] args, String cacheArgs, Object cacheObject, Cache cacheAnn) {
+    private Object cacheInMemori(Method method, Object[] args, String cacheArgs, Object cacheObject, Cache cacheAnn) {
         Object result = null;
         try {
             result = method.invoke(cacheObject, args);
         } catch (InvocationTargetException | IllegalAccessException e) {
             e.printStackTrace();
         }
-        cacheMethods.put(cacheArgs, Trim.trim(method, result, cacheAnn.countElement()));
+        cacheMethods.put(cacheArgs, trim.cut(method, result, cacheAnn.countElement()));
         cacheMemori.put(key, cacheMethods);
         return result;
     }

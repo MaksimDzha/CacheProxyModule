@@ -1,4 +1,6 @@
 package ru.sbrf;
+
+import java.io.IOException;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 
@@ -13,6 +15,9 @@ public class CacheProxy implements InvocationHandler {
         this.cacheObject = cacheObject;
     }
 
+    private CacheInMemory cacheInMemory = new CacheInMemory();
+    private CacheInFiles cacheInFiles = new CacheInFiles();
+
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         System.out.println("Работает прокси");
@@ -25,10 +30,11 @@ public class CacheProxy implements InvocationHandler {
             switch (cacheAnn.value()) {
                 case IN_MEMORY:
                     System.out.println(StorageType.IN_MEMORY);
-                    return CacheInMemory.findInMemory(method, args, cacheObject, cacheAnn);
+                    return cacheInMemory.findInMemory(method, args, cacheObject, cacheAnn);
                 case IN_FILES:
                     System.out.println(StorageType.IN_FILES);
-                    return CacheInFiles.findInFiles(method, args, cacheObject, cacheAnn);
+                    return cacheInFiles.findInFiles(method, args, cacheObject, cacheAnn);
+
             }
         }
         System.out.println("Метод без аннотации @Cache, выполняем без кеширования: ");

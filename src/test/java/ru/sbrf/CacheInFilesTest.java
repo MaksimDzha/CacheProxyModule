@@ -2,6 +2,7 @@ package ru.sbrf;
 
 import org.junit.Test;
 
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.LinkedList;
 import java.util.List;
@@ -28,11 +29,17 @@ public class CacheInFilesTest {
             Integer[] args1 = {0, 10};
             Integer[] args2 = {0, 3};
 
-            assertEquals(testObject1.subList(0, 10), CacheInFiles.findInFiles(method, args1, testObject1, cache));
-            assertEquals(testObject1.subList(0, 7), CacheInFiles.findInFiles(method, args1, testObject1, cache));
+            CacheInFiles cacheInFiles = new CacheInFiles();
+            try {
+                assertEquals(testObject1.subList(0, 10), cacheInFiles.findInFiles(method, args1, testObject1, cache));
+                assertEquals(testObject1.subList(0, 7), cacheInFiles.findInFiles(method, args1, testObject1, cache));
 
-            assertEquals(testObject1.subList(0, 3), CacheInFiles.findInFiles(method, args2, testObject1, cache));
-            assertEquals(testObject1.subList(0, 3), CacheInFiles.findInFiles(method, args2, testObject1, cache));
+                assertEquals(testObject1.subList(0, 3), cacheInFiles.findInFiles(method, args2, testObject1, cache));
+                assertEquals(testObject1.subList(0, 3), cacheInFiles.findInFiles(method, args2, testObject1, cache));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
         }
     }
 }

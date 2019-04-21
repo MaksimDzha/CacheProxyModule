@@ -6,9 +6,9 @@ import java.util.TreeSet;
 //Если в аннотации @Cache указаны номера аргументов, по которым определяется уникальность,
 //будут использованы только указанные аргументы (при наличии).
 
-class CashArgs {
+class CacheArgs {
 
-    static String get(Object[] args, Cache cacheAnn) {
+    String get(Object[] args, Cache cacheAnn) {
         String cacheArgs = new String();
         Set<Integer> argsToCache = new TreeSet<>();
         for (Integer i : cacheAnn.args())

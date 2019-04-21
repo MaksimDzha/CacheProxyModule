@@ -14,7 +14,7 @@ class Trim {
      * @param result Результат работы method
      * @param count  Ограничение, наложенное на количество элементов
      */
-    static Object trim(Method method, Object result, int count) {
+    Object cut(Method method, Object result, int count) {
         if (method.getReturnType().getName().equals("java.util.List"))
             return trimList(result, count);
         if (method.getReturnType().getName().equals("java.util.Set"))
@@ -34,14 +34,14 @@ class Trim {
     }
 
     //Удаление "лишних" элементов из коллекции, использующей интерфейс List
-    private static Object trimList(Object result, int count) {
+    private Object trimList(Object result, int count) {
         List newResult = (List) result;
         if (newResult.size() < count) count = newResult.size();
         return newResult.stream().limit(count).collect(toList());
     }
 
     //Удаление "лишних" элементов из множества, использующего интерфейс Set
-    private static Object trimSet(Object result, int count) {
+    private Object trimSet(Object result, int count) {
         System.out.println("Мы в trimSet");
         Set newResult = (Set) result;
         if (newResult.size() < count) count = newResult.size();
@@ -49,7 +49,7 @@ class Trim {
     }
 
     //Удаление "лишних" элементов из массива
-    private static Object trimArray(Object result, int count) {
+    private Object trimArray(Object result, int count) {
         if (((Object[]) result).length < count) count = ((Object[]) result).length;
         return Arrays.copyOfRange((Object[]) result, 0, count);
     }

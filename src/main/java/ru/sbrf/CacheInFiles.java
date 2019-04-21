@@ -13,6 +13,15 @@ class CacheInFiles {
     //Хранение и восстановление кэша реализовано с помощью класса HashMap
     private static Map<String, Object> cacheMethods = new HashMap<>();
 
+    //Класс для создания директории кэширования
+    private CacheDir cacheDir = new CacheDir();
+
+    //Класс для создания одной из частей "ключа" из массива аргументов
+    private CacheArgs cArgs = new CacheArgs();
+
+    //Класс для "обрезания" слишком больших контейнеров и массивов
+    private Trim trim = new Trim();
+
     /**
      * Поиск результата в кэшированных файлах
      *
@@ -21,12 +30,13 @@ class CacheInFiles {
      * @param cacheObject Объект, в котором реализован method
      * @param cacheAnn    Аннотация с настройками вариантов кэширования (см. Cache.class)
      */
-    static Object findInFiles(Method method, Object[] args, Object cacheObject, Cache cacheAnn) {
-        String cacheArgs = CashArgs.get(args, cacheAnn); //Индекс для поиска или записи результата
+    Object findInFiles(Method method, Object[] args, Object cacheObject, Cache cacheAnn) throws IOException {
+        String cacheArgs = cArgs.get(args, cacheAnn); //Индекс для поиска или записи результата
         try {
             FileInputStream fis = new FileInputStream(fileName(cacheObject, method, cacheAnn));
-            ObjectInputStream ois = new ObjectInputStream(fis);
-            cacheMethods = (HashMap) ois.readObject();
+            try (ObjectInputStream ois = new ObjectInputStream(fis)) {
+                cacheMethods = (HashMap) ois.readObject();
+            }
             if (cacheMethods.containsKey(cacheArgs)) {
                 System.out.println("Результат из кэша с аргументами ( " + cacheArgs + "): " + cacheMethods.get(cacheArgs));
                 return cacheMethods.get(cacheArgs);
@@ -34,41 +44,41 @@ class CacheInFiles {
         } catch (FileNotFoundException e) {
             cacheMethods.clear();
             System.out.print("Метод не кэшировался. ");
-        } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+             e.printStackTrace();
         }
         System.out.println("Результат не найден, запускается выполнение основного алгоритма:");
         return cacheInFiles(method, args, cacheArgs, cacheObject, cacheAnn);
     }
 
     //Запись результата в файл (добавление)
-    private static Object cacheInFiles(Method method, Object[] args, String cacheArgs, Object cacheObject, Cache cacheAnn) {
+    private Object cacheInFiles(Method method, Object[] args, String cacheArgs, Object cacheObject, Cache cacheAnn) throws IOException {
         Object result = null;
         try {
             result = method.invoke(cacheObject, args);
         } catch (InvocationTargetException | IllegalAccessException e) {
             e.printStackTrace();
         }
-        cacheMethods.put(cacheArgs, Trim.trim(method, result, cacheAnn.countElement()));
+        cacheMethods.put(cacheArgs, trim.cut(method, result, cacheAnn.countElement()));
+        cacheDir.create();
         try {
-            CacheDir.create();
             FileOutputStream fos = new FileOutputStream(fileName(cacheObject, method, cacheAnn));
-            ObjectOutputStream oos = new ObjectOutputStream(fos);
-            oos.writeObject(cacheMethods);
-            oos.flush();
-            oos.close();
-        } catch (Exception e) {
-            System.out.println("Ошибка записи");
+            try (ObjectOutputStream oos = new ObjectOutputStream(fos)) {
+                oos.writeObject(cacheMethods);
+                oos.flush();
+            }
+        } catch (FileNotFoundException e) {
+            System.out.println("Файл не найден");
 //            e.printStackTrace();
         }
         return result;
     }
 
     //Получение имени файла, в котором должны содержаться кэшированные данные
-    private static String fileName(Object cacheObject, Method method, Cache cacheAnn) {
+    private String fileName(Object cacheObject, Method method, Cache cacheAnn) {
         if (cacheAnn.fileName().isEmpty())
-            return (CacheDir.getCachePath() + cacheObject.hashCode() + "." + cacheObject.getClass().getName() + "." + method.getName() + ".cache");
-        else return (CacheDir.getCachePath() + cacheAnn.fileName() + ".cache");
+            return (cacheDir.getCachePath() + cacheObject.hashCode() + "." + cacheObject.getClass().getName() + "." + method.getName() + ".cache");
+        else return (cacheDir.getCachePath() + cacheAnn.fileName() + ".cache");
     }
 
 

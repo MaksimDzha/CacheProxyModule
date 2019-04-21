@@ -9,7 +9,7 @@ public class CacheDir {
     private static File cacheDir = new File("cache");
 
     //Создание директории cache
-    public static void create() {
+    public void create() {
         if (!cacheDir.exists()) {
             System.out.println("Создание директории для хранения кэш-файлов: " + cacheDir.getAbsolutePath());
             boolean dirCacheExist = false;
@@ -26,7 +26,7 @@ public class CacheDir {
     }
 
     //Путь к директории
-    public static String getCachePath(){
+    public String getCachePath(){
         if (cacheDir.exists())
             return (cacheDir.getAbsolutePath() + "\\");
         return "";
